@@ -28,7 +28,7 @@ steps:
       pip3 install robotframework
 
   - script: |
-      robot -i /testcases -o /testcases
+      robot -i testcases
 
   - task: PublishTestResults@2
     inputs:
