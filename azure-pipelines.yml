@@ -3,35 +3,24 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-name: Robot Framework Test
-
 trigger:
-  branches:
-    include:
-      - master
+- master
 
-pool:
-  vmImage: 'ubuntu-latest' 
+jobs:
 
-steps:
-  - script: |
-      sudo apt-get update
-      sudo apt-get install -y python3-pip
+- job: 'Test'
+  pool:
+    vmImage: 'vs2017-win2016'
 
+  steps:
   - task: UsePythonVersion@0
     inputs:
-      versionSpec: '3.x'
-      addToPath: true
+      versionSpec: '3.7'
+      architecture: 'x64'
 
-  - script: |
-      pip3 install --upgrade pip
-      pip3 install robotframework
-
-  - script: |
-      robot -i --outputdir $(Build.ArtifactStagingDirectory)/test_results
-
-  - task: PublishTestResults@2
-    inputs:
-      testResultsFormat: 'JUnit'
-      testResultsFiles: 'test_results/*.xml'  
+  - script: pip install robotframework robotframework-seleniumlibrary && npm install chromedriver
+    displayName: 'Install dependencies'
+  
+  - powershell: robot --pythonpath . -x outputxunit.xml TestCases.robot
+    displayName: 'Run Robot Scripts'
 
